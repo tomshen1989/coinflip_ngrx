@@ -1,0 +1,58 @@
+<div class="coinflip-card">
+  <h1>🪙 NgRx Coinflip</h1>
+
+  <div class="stats">
+    <div class="stat">
+      <span class="label">Balance</span>
+      <span class="value">{{ balance() }}</span>
+    </div>
+    <div class="stat">
+      <span class="label">Win rate</span>
+      <span class="value">{{ winRate() }}%</span>
+    </div>
+    <div class="stat">
+      <span class="label">Streak</span>
+      <span class="value" [class.win]="streak() > 0" [class.lose]="streak() < 0">
+        {{ streak() > 0 ? '🔥 +' + streak() : streak() < 0 ? '💀 ' + streak() : '–' }}
+      </span>
+    </div>
+  </div>
+
+  <label class="wager">
+    Wager
+    <input
+      type="number"
+      min="1"
+      [max]="balance()"
+      [value]="wager()"
+      (input)="wager.set(+$any($event.target).value)"
+    />
+  </label>
+
+  <div class="call-buttons">
+    <button (click)="call('heads')" [disabled]="flipping()">Call Heads</button>
+    <button (click)="call('tails')" [disabled]="flipping()">Call Tails</button>
+  </div>
+
+  @if (flipping()) {
+    <p class="flipping">🪙 Flipping...</p>
+  }
+
+  @if (error()) {
+    <p class="error">⚠️ {{ error() }}</p>
+  }
+
+  <h2>Last 5 flips</h2>
+  <ul class="history">
+    @for (flip of lastFive(); track flip.id) {
+      <li [class.win]="flip.won" [class.lose]="!flip.won">
+        Called {{ flip.call }}, landed {{ flip.result }} —
+        {{ flip.won ? 'Won' : 'Lost' }}
+      </li>
+    } @empty {
+      <li class="empty">No flips yet. Place a bet!</li>
+    }
+  </ul>
+
+  <button class="reset" (click)="reset()">Reset Game</button>
+</div>
